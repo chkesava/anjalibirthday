@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "motion/react"
 import { Mail, Heart, Sparkles, RotateCcw } from "lucide-react"
 import confetti from "canvas-confetti"
@@ -11,12 +11,21 @@ export default function Letter() {
     const [currentText, setCurrentText] = useState("")
     const [showCursor, setShowCursor] = useState(true)
 
-    const letterText = `Dear Anjali,
+    const letterText = `Dear Anjali ❤️
 Happy Birthday! 🎉
-I’m really grateful to have you as my friend. You always bring joy, laughter, and positive vibes wherever you go. Your kindness and energy make every moment memorable.
-Thanks for being such an amazing friend — college wouldn’t be the same without you!
-Wishing you lots of happiness, success, and smiles ahead. 💫
-Your friend always,
+
+I don’t even know where to start because words will never be enough to tell you how much you mean to me. You’ve been more than just a friend — you’ve been my constant, my peace, and my favorite person since the day we met.
+
+You’ve seen me at my best and at my worst, and still stayed. You bring so much laughter, calmness, and light wherever you go. Your presence makes everything better — college, life, and every little moment in between.
+
+I may fight with you, get jealous sometimes, or act possessive — but it’s only because you’re that special. I can’t imagine sharing my place in your life with anyone else. You’re my one and only “Best Friend,” and I’ll never replace you, no matter what.
+
+You mean the world to me, Anjali. I trust you with my heart — please keep it safe. Thank you for being the person who makes my days brighter and my heart lighter.
+
+On your special day, I just want you to know how deeply you’re loved, how truly you’re appreciated, and how grateful I am to have you in my life. 💫
+
+Happy Birthday once again, my best friend for life.
+With all my love and care,
 Kesava 💛`
 
     useEffect(() => {
@@ -42,6 +51,17 @@ Kesava 💛`
             return () => clearInterval(timer)
         }
     }, [showText, letterText])
+
+    // Auto-scroll to latest text while typing
+    const scrollRef = useRef(null);
+
+    useEffect(() => {
+        const el = scrollRef.current;
+        if (!el) return;
+
+        // Smoothly scroll to bottom
+        el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+    }, [currentText]);
 
     const handleOpenLetter = () => {
         setIsOpen(true)
@@ -144,7 +164,7 @@ Kesava 💛`
                                     </motion.div>
                                 </div>
 
-                                <div className="min-h-72 max-h-72 overflow-y-auto text-gray-700 leading-relaxed">
+                                <div ref={scrollRef} className="min-h-72 max-h-72 overflow-y-auto text-gray-700 leading-relaxed">
                                     {showText && (
                                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-3 mr-2 ">
                                             <div className="whitespace-pre-wrap font-cute">

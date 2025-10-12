@@ -7,13 +7,95 @@ import { EffectCube, Pagination } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/effect-cube'
 import 'swiper/css/pagination'
+import { useEffect, useRef, useState } from 'react'
 
 export default function PhotoGallery({ onNext }) {
 
+    const audioRef = useRef(null);
+    const [isPlaying, setIsPlaying] = useState(false);
+
+    useEffect(() => {
+        const audio = new Audio('/audio/happy-birthday.mp3');
+        audio.loop = true;
+        audioRef.current = audio;
+
+        let gestureListener = null;
+        let savedTime = 0;
+
+        const tryPlay = async () => {
+            try {
+                await audio.play();
+                setIsPlaying(true);
+            } catch (err) {
+                setIsPlaying(false);
+                gestureListener = () => {
+                    audio.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
+                    window.removeEventListener('pointerdown', gestureListener);
+                    window.removeEventListener('keydown', gestureListener);
+                };
+
+                window.addEventListener('pointerdown', gestureListener, { once: true });
+                window.addEventListener('keydown', gestureListener, { once: true });
+            }
+        };
+
+        const handleVisibilityChange = () => {
+            if (document.hidden) {
+                // Save time and pause
+                try { savedTime = audio.currentTime; } catch (e) { savedTime = 0; }
+                try { audio.pause(); } catch (e) { }
+                setIsPlaying(false);
+            } else {
+                // Resume from saved time
+                try { audio.currentTime = savedTime; } catch (e) { }
+                audio.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
+            }
+        };
+
+        const handleBlur = () => {
+            try { savedTime = audio.currentTime; } catch (e) { savedTime = 0; }
+            try { audio.pause(); } catch (e) { }
+            setIsPlaying(false);
+        };
+
+        const handleFocus = () => {
+            try { audio.currentTime = savedTime; } catch (e) { }
+            audio.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
+        };
+
+        tryPlay();
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        window.addEventListener('blur', handleBlur);
+        window.addEventListener('focus', handleFocus);
+
+        return () => {
+            if (gestureListener) {
+                window.removeEventListener('pointerdown', gestureListener);
+                window.removeEventListener('keydown', gestureListener);
+            }
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            window.removeEventListener('blur', handleBlur);
+            window.removeEventListener('focus', handleFocus);
+            audio.pause();
+            audio.src = '';
+            audioRef.current = null;
+        };
+    }, []);
+
     const photos = [
-        { id: 1, src: "/images/Snapchat-1233268129.jpg" },
-        { id: 2, src: "/images/IMG-20250216-WA0003.jpg" },
+        { id: 1, type: 'image', src: "/images/image-5.jpg" },
+        { id: 2, type: 'image', src: "/images/image-6.jpg" },
+        { id: 3, type: 'image', src: "/images/Snapchat-1233268129.jpg" },
+        { id: 4, type: 'image', src: "/images/IMG-20250216-WA0003.jpg" },
+        { id: 5, type: 'image', src: "/images/IMG-20250126-WA0008.jpg" },
+        // Example video entry. Put your video file in public/videos/ for /videos/your-video.mp4
+        { id: 6, type: 'video', src: "/images/video-1.mp4" },
+
     ]
+
+    // Keep refs to any video elements so we can pause them when needed
+    const videoRefs = useRef({});
 
     return (
         <motion.div
@@ -46,6 +128,26 @@ export default function PhotoGallery({ onNext }) {
                 <p className="text-xl text-purple-300">Memorable Moments in college</p>
             </motion.div>
 
+            {/* Play / Pause audio control */}
+            <div className="absolute top-4 right-4 z-30">
+                <button
+                    aria-label={isPlaying ? 'Pause music' : 'Play music'}
+                    onClick={() => {
+                        const audio = audioRef.current;
+                        if (!audio) return;
+                        if (isPlaying) {
+                            audio.pause();
+                            setIsPlaying(false);
+                        } else {
+                            audio.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
+                        }
+                    }}
+                    className="bg-white/80 text-gray-800 px-3 py-1 rounded-full shadow-sm hover:scale-105 transition-transform"
+                >
+                    {isPlaying ? 'Pause Music' : 'Play Music'}
+                </button>
+            </div>
+
             {/* Cube Gallery */}
             <div className="w-full max-w-sm mx-auto">
                 <Swiper
@@ -54,7 +156,7 @@ export default function PhotoGallery({ onNext }) {
                     cubeEffect={{
                         shadow: true,
                         slideShadows: true,
-                        shadowOffset: 20,
+                        shadowOffset: 10,
                         shadowScale: 0.94,
                     }}
                     pagination={true}
@@ -63,11 +165,43 @@ export default function PhotoGallery({ onNext }) {
                 >
                     {photos.map((photo, index) => (
                         <SwiperSlide key={photo.id}>
-                            <img
-                                src={photo.src || "/placeholder.svg"}
-                                alt={`Memory ${index + 1}`}
-                                className="w-full h-full object-cover rounded-xl"
-                            />
+                            {photo.type === 'video' ? (
+                                <video
+                                    ref={(el) => (videoRefs.current[photo.id] = el)}
+                                    src={photo.src}
+                                    className="w-full h-full object-cover rounded-xl bg-black"
+                                    controls
+                                    playsInline
+                                    onPlay={() => {
+                                        // Pause background music when a video plays
+                                        const audio = audioRef.current;
+                                        if (audio && !audio.paused) {
+                                            try { audio.pause(); } catch (e) { }
+                                            setIsPlaying(false);
+                                        }
+                                    }}
+                                    onPause={() => {
+                                        // Resume background music when video pauses (optional)
+                                        const audio = audioRef.current;
+                                        if (audio && audio.paused) {
+                                            try { audio.play().then(() => setIsPlaying(true)).catch(() => {}); } catch (e) { }
+                                        }
+                                    }}
+                                    onEnded={() => {
+                                        // Resume background music when video ends
+                                        const audio = audioRef.current;
+                                        if (audio && audio.paused) {
+                                            try { audio.play().then(() => setIsPlaying(true)).catch(() => {}); } catch (e) { }
+                                        }
+                                    }}
+                                />
+                            ) : (
+                                <img
+                                    src={photo.src || "/placeholder.svg"}
+                                    alt={`Memory ${index + 1}`}
+                                    className="w-full h-full object-cover rounded-xl"
+                                />
+                            )}
                         </SwiperSlide>
                     ))}
                 </Swiper>
@@ -80,7 +214,20 @@ export default function PhotoGallery({ onNext }) {
                 transition={{ delay: 1 }}
             >
                 <button
-                    onClick={onNext}
+                    onClick={(e) => {
+                        const audio = audioRef.current;
+                        if (audio) {
+                            try { audio.pause(); } catch (err) { }
+                            setIsPlaying(false);
+                        }
+
+                        // Pause any playing videos
+                        Object.values(videoRefs.current || {}).forEach((v) => {
+                            try { if (v && !v.paused) v.pause(); } catch (e) {}
+                        });
+
+                        if (typeof onNext === 'function') onNext(e);
+                    }}
                     className="bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 hover:from-pink-500 hover:via-purple-500 hover:to-indigo-500 text-white text-lg px-8 py-4 rounded-full shadow-xl border-2 border-white/70 transition-all duration-300 hover:scale-[103%]"
                 >
                     <motion.div className="flex items-center space-x-2" whileHover={{ x: 5 }}>
