@@ -85,14 +85,15 @@ export default function PhotoGallery({ onNext }) {
 
     const photos = [
         { id: 1, type: 'image', src: "/images/image-5.jpg" },
-        { id: 2, type: 'image', src: "/images/image-6.jpg" },
+        { id: 2, type: 'image', src: "/images/IMG-20250126-WA0008.jpg" },
         { id: 3, type: 'image', src: "/images/Snapchat-1233268129.jpg" },
         { id: 4, type: 'image', src: "/images/IMG-20250216-WA0003.jpg" },
-        { id: 5, type: 'image', src: "/images/IMG-20250126-WA0008.jpg" },
+        { id: 5, type: 'image', src: "/images/image-6.jpg" },
         // Example video entry. Put your video file in public/videos/ for /videos/your-video.mp4
         { id: 6, type: 'video', src: "/images/video-1.mp4" },
 
     ]
+    
 
     // Keep refs to any video elements so we can pause them when needed
     const videoRefs = useRef({});

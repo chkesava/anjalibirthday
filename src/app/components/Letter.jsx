@@ -11,25 +11,27 @@ export default function Letter() {
     const [currentText, setCurrentText] = useState("")
     const [showCursor, setShowCursor] = useState(true)
 
-    const letterText = `Dear Anjali ❤️
-Happy Birthday! 🎉
-
-I don’t even know where to start because words will never be enough to tell you how much you mean to me. You’ve been more than just a friend — you’ve been my constant, my peace, and my favorite person since the day we met.
-
-You’ve seen me at my best and at my worst, and still stayed. You bring so much laughter, calmness, and light wherever you go. Your presence makes everything better — college, life, and every little moment in between.
-
-I may fight with you, get jealous sometimes, or act possessive — but it’s only because you’re that special. I can’t imagine sharing my place in your life with anyone else. You’re my one and only “Best Friend,” and I’ll never replace you, no matter what.
-
-You mean the world to me, Anjali. I trust you with my heart — please keep it safe. Thank you for being the person who makes my days brighter and my heart lighter.
-
-On your special day, I just want you to know how deeply you’re loved, how truly you’re appreciated, and how grateful I am to have you in my life. 💫
-
-Happy Birthday once again, my best friend for life.
-With all my love and care,
-Kesava 💛`
+    // Load the letter content from a text file in the public folder (public/letter.txt)
+    // Put the text file at: public/letter.txt
+    const [letterText, setLetterText] = useState("");
 
     useEffect(() => {
-        if (showText) {
+        if (showText && !letterText) {
+            // Fetch the letter text from the public folder. This runs once when the letter is opened.
+            fetch('/letter.txt')
+                .then((res) => {
+                    if (!res.ok) throw new Error('Failed to fetch letter text');
+                    return res.text();
+                })
+                .then((text) => setLetterText(text))
+                .catch((err) => {
+                    console.error('Error loading letter text:', err);
+                    // Fallback - brief message if file not found
+                    setLetterText('Dear Anjali,\nHappy Birthday! 🎉');
+                });
+        }
+
+        if (showText && letterText) {
             let index = 0
             const timer = setInterval(() => {
                 if (index < letterText.length) {
@@ -46,7 +48,7 @@ Kesava 💛`
                         colors: ["#ff69b4", "#ff1493", "#9370db", "#8a2be2", "#ffd700"],
                     })
                 }
-            }, 30)
+            }, 50)
 
             return () => clearInterval(timer)
         }
@@ -75,6 +77,7 @@ Kesava 💛`
         setShowText(false)
         setCurrentText("")
         setShowCursor(true)
+        setLetterText("")
     }
 
     return (
