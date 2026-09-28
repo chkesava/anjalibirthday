@@ -236,9 +236,6 @@ export const timeline = [
 // A "set" uses its first photo wherever a single image is needed (credits backdrop, preloading).
 for (const m of timeline) if (m.images && !m.image) m.image = m.images[0]
 
-// The earphones photo closes the whole experience, too.
-export const finalPhoto = timeline.find((m) => m.type === "moment").image
-
 // Everything the arrival preloads while she reads the first lines.
 export const preloadImages = [...archive, ...timeline]
     .flatMap((m) => (m.images ?? [m.image]).map((i) => i.src))

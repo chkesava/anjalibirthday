@@ -43,7 +43,7 @@ export default function SystemStatus({ label = VERSION, onReplay }) {
                             key="panel"
                             role="dialog"
                             aria-label="System status"
-                            className="fixed left-1/2 z-50 w-[min(88vw,320px)] -translate-x-1/2 rounded-[12px] border border-cream/10 bg-night-900 px-5 pb-4 pt-4 text-left font-mono text-[0.75rem] leading-[1.9] text-cream-muted shadow-[0_24px_60px_-20px_rgb(0_0_0/.8)]"
+                            className="fixed left-1/2 z-50 max-h-[calc(100dvh-96px)] w-[min(88vw,320px)] -translate-x-1/2 overflow-y-auto overscroll-contain rounded-[12px] border border-cream/10 bg-night-900 px-5 pb-4 pt-4 text-left font-mono text-[0.75rem] leading-[1.9] text-cream-muted shadow-[0_24px_60px_-20px_rgb(0_0_0/.8)]"
                             style={{ bottom: "max(64px, calc(env(safe-area-inset-bottom) + 56px))" }}
                             initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
                             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -82,7 +82,7 @@ export default function SystemStatus({ label = VERSION, onReplay }) {
                             <div className="mt-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t border-cream/10 pt-3">
                                 <span className="whitespace-nowrap text-cream-faint">{VERSION}</span>
                                 {onReplay && (
-                                    <button type="button" onClick={onReplay} className="min-h-9 whitespace-nowrap px-1 text-cream underline decoration-cream/25 underline-offset-4 hover:decoration-gold">
+                                    <button type="button" onClick={onReplay} className="min-h-11 whitespace-nowrap px-1 text-cream underline decoration-cream/25 underline-offset-4 hover:decoration-gold">
                                         watch it again &#8634;
                                     </button>
                                 )}

@@ -12,7 +12,6 @@ export const SKIP_COUNTDOWN_IN_DEV = true
 // the next one plays instead, so there's never silence or an error.
 // Drop "Yaaron" at public/audio/yaaron.mp3 (or change the first path).
 export const SONG_SOURCES = ["/audio/yaaron.mp3", "/audio/happy-birthday.mp3"]
-export const SONG_CREDIT = "“Yaaron” — KK"
 
 // Optional voice note for "one last thing" (e.g. "/audio/voice-note.m4a").
 // Leave null to show the "see you soon" ticket instead.

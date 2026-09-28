@@ -81,6 +81,7 @@ export default function LetterSheet({ text, date, onKeep, onBack }) {
 
     return (
         <div className="relative z-10 min-h-dvh px-0 pb-0 sm:px-6 sm:pb-24 sm:pt-20" onClick={() => !all && setShown(steps)}>
+            <div aria-hidden="true" className="pointer-events-none fixed inset-x-0 top-0 z-20 h-20 bg-gradient-to-b from-paper-50 via-paper-50/80 to-transparent sm:from-paper-100 sm:via-paper-100/70" />
             <motion.article
                 className="paper-grain relative mx-auto max-w-[41rem] select-text bg-paper-50 px-7 pb-14 pt-[max(92px,calc(env(safe-area-inset-top)+76px))] text-ink sm:rounded-[3px] sm:px-16 sm:pb-20 sm:pt-16"
                 style={{ boxShadow: "0 1px 1px rgb(42 34 29 / .06), 0 2px 6px rgb(42 34 29 / .06), 0 26px 60px -24px rgb(42 34 29 / .32)" }}
@@ -90,7 +91,7 @@ export default function LetterSheet({ text, date, onKeep, onBack }) {
             >
                 {/* letterhead */}
                 <header className="flex items-baseline justify-between gap-4">
-                    <p className="t-meta text-ink-muted/80">a letter &middot; for Anjali</p>
+                    <p className="t-meta whitespace-nowrap text-ink-muted/80">for Anjali</p>
                     <p className="font-hand text-[1.25rem] leading-none text-ink-muted" style={{ rotate: "-2deg" }}>
                         {date}
                     </p>

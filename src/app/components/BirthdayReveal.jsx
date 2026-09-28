@@ -366,6 +366,7 @@ function Candle({ lit, blown }) {
             <motion.circle
                 className={lit ? "candle-glow" : undefined}
                 cx="32" cy="36" r="34" fill="url(#halo)"
+                initial={{ opacity: 1 }}
                 animate={{ opacity: lit ? 1 : 0 }}
                 transition={{ duration: 0.5 }}
             />
@@ -373,6 +374,7 @@ function Candle({ lit, blown }) {
             {/* flame */}
             <motion.g
                 style={{ originX: "32px", originY: "58px" }}
+                initial={{ opacity: 1, scaleY: 1, skewX: 0 }}
                 animate={lit ? { opacity: 1, scaleY: 1, skewX: 0 } : { opacity: 0, scaleY: 0.2, skewX: 14 }}
                 transition={{ duration: lit ? 0.6 : 0.5, ease: EASE_SOFT }}
             >

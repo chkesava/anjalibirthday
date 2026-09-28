@@ -38,10 +38,10 @@ function greetInConsole() {
     console.log("%c" + devReturn, "font:13px/2 ui-monospace,monospace;color:#D9A441")
 }
 
-export default function Experience({ letter }) {
+export default function Experience({ letter, songs }) {
     return (
         <MotionConfig reducedMotion="user">
-            <SoundProvider>
+            <SoundProvider sources={songs}>
                 <Story letter={letter} />
             </SoundProvider>
         </MotionConfig>

@@ -3,12 +3,12 @@
 export const SCENES = [
     { id: "countdown", level: 0 },
     { id: "intro", level: 0.55 },
-    { id: "reveal", chapter: "02 · happy birthday", level: 0.25, resume: "the birthday candle" },
-    { id: "archive", chapter: "03 · the chaos archive", level: 0.55, resume: "the chaos archive" },
-    { id: "timeline", chapter: "04 · our timeline", level: 0.5, resume: "our timeline" },
-    { id: "things", chapter: "05 · things i never say", level: 0.35, resume: "things i never say" },
+    { id: "reveal", chapter: "happy birthday", level: 0.25, resume: "the birthday candle" },
+    { id: "archive", chapter: "the chaos archive", level: 0.55, resume: "the chaos archive" },
+    { id: "timeline", chapter: "our timeline", level: 0.5, resume: "our timeline" },
+    { id: "things", chapter: "things i never say", level: 0.35, resume: "things i never say" },
     { id: "letter", level: 0.22, resume: "the letter" },
-    { id: "before", chapter: "07 · before you leave", level: 0.45, resume: "before you leave" },
+    { id: "before", chapter: "before you leave", level: 0.45, resume: "before you leave" },
     { id: "ending", level: 0.36, resume: "the ending" },
 ]
 

@@ -55,6 +55,7 @@
 }
 
 html {
+  position: relative; /* scroll-linked animations measure against the page */
   background: var(--color-night-950);
 }
 
@@ -83,14 +84,6 @@ button {
 
 @layer components {
 /* ---------- Type roles ---------- */
-
-.t-name {
-  font-family: var(--font-display);
-  font-weight: 300;
-  font-variation-settings: "SOFT" 100;
-  font-size: clamp(4.5rem, 20vw, 11rem);
-  line-height: 0.9;
-}
 
 .t-display {
   font-family: var(--font-display);

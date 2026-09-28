@@ -329,11 +329,11 @@ function PhotoSet({ m, n }) {
                 </div>
             </div>
 
-            <div className="mx-auto mt-12 flex max-w-[1120px] justify-center pl-9 pr-3 md:mt-16 md:px-10">
+            <div className="mx-auto mt-12 flex max-w-[1120px] justify-center pl-10 pr-4 md:mt-16 md:px-10">
                 {images.map((image, k) => (
                     <div
                         key={image.src}
-                        className="-mx-[3.5vw] md:-mx-5"
+                        className="-mx-[2.5vw] md:-mx-5"
                         style={{ zIndex: k === 1 ? 2 : 1, marginTop: SET_LIFT[k % 3] }}
                     >
                         <Print
@@ -341,7 +341,7 @@ function PhotoSet({ m, n }) {
                             rotate={SET_TILT[k % 3]}
                             delay={k * 0.22}
                             parallax={14 + k * 8}
-                            maxW="min(33vw, 270px)"
+                            maxW="min(28vw, 270px)"
                             maxH="min(46dvh, 480px)"
                         />
                     </div>
@@ -379,9 +379,9 @@ function Moment({ m, n }) {
     const photoY = useTransform(p, [0.32, 0.5], reduced ? [0, 0] : [26, 0])
     const develop = useTransform(p, [0.34, 0.62], ["saturate(0.45) brightness(1.14)", "saturate(1) brightness(1)"])
     const zoom = useTransform(p, [0.32, 1], reduced ? [1, 1] : [1, 1.06])
-    const words = useTransform(p, [0.58, 0.68], [0, 1])
+    const words = useTransform(p, [0.58, 0.68, 0.95, 1], [0, 1, 1, 0])
     const wordsY = useTransform(p, [0.58, 0.68], [12, 0])
-    const note = useTransform(p, [0.74, 0.82], [0, 1])
+    const note = useTransform(p, [0.74, 0.82, 0.95, 1], [0, 1, 1, 0])
     const noteClip = useTransform(p, [0.74, 0.84], ["inset(0 100% 0 0)", "inset(0 0% 0 0)"])
 
     return (

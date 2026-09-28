@@ -15,7 +15,7 @@ const effectiveLevel = ({ muted, duck, level }) => {
     return duck.current ?? level.current
 }
 
-export function SoundProvider({ children }) {
+export function SoundProvider({ children, sources = SONG_SOURCES }) {
     const audioRef = useRef(null)
     const graphRef = useRef(null) // { ctx, gain }
     const levelRef = useRef(0)
@@ -71,8 +71,8 @@ export function SoundProvider({ children }) {
         let index = 0
         const onError = () => {
             index += 1
-            if (index < SONG_SOURCES.length) {
-                audio.src = SONG_SOURCES[index]
+            if (index < sources.length) {
+                audio.src = sources[index]
                 audio.load()
                 if (startedRef.current && !mutedRef.current) audio.play().catch(() => { })
             }
@@ -83,7 +83,7 @@ export function SoundProvider({ children }) {
         }
         audio.addEventListener("error", onError)
         audio.addEventListener("canplaythrough", onReady)
-        audio.src = SONG_SOURCES[0]
+        audio.src = sources[0]
         audioRef.current = audio
 
         const savedMuted = storage.get("anjali:muted") === "1"
@@ -99,7 +99,7 @@ export function SoundProvider({ children }) {
             graphRef.current = null
             audioRef.current = null
         }
-    }, [])
+    }, [sources])
 
     // Pause while she's away; resume only if she hadn't muted it.
     useEffect(() => {

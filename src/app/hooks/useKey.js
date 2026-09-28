@@ -11,6 +11,8 @@ export function useKeys(handlers, enabled = true) {
         if (!enabled) return
         const onKey = (e) => {
             if (e.metaKey || e.ctrlKey || e.altKey) return
+            // A focused control keeps its own Enter/Space (so Tab + Enter always works).
+            if ((e.key === "Enter" || e.key === " ") && e.target.closest?.("button, a, input, textarea, select, [role=button]")) return
             const fn = ref.current[e.key]
             if (fn) {
                 e.preventDefault()

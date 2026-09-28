@@ -163,7 +163,7 @@ function Line({ show, dim, muted, children }) {
     return (
         <motion.p
             className={`font-display italic ${muted ? "text-cream-muted" : "text-cream"}`}
-            style={{ fontSize: "clamp(1.3125rem, 4.8vw, 1.75rem)", lineHeight: 1.3, fontVariationSettings: '"SOFT" 100' }}
+            style={{ fontSize: "clamp(1.3125rem, 4.8vw, 2rem)", lineHeight: 1.3, fontVariationSettings: '"SOFT" 100' }}
             initial={{ opacity: 0, y: 10, filter: "blur(8px)", letterSpacing: "0.02em" }}
             animate={
                 show

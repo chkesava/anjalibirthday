@@ -132,7 +132,7 @@ function Card({ card, open, onOpen }) {
                                     href={replyLink()}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="font-sans text-[0.875rem] font-medium text-ink underline decoration-ink/25 underline-offset-4 hover:decoration-gold"
+                                    className="inline-flex min-h-11 items-center font-sans text-[0.875rem] font-medium text-ink underline decoration-ink/25 underline-offset-4 hover:decoration-gold"
                                 >
                                     send something back <span className="text-gold">&rarr;</span>
                                 </a>

@@ -172,6 +172,7 @@ function Seal({ state, onBreak, onNudge }) {
                 onPointerLeave={release}
                 onPointerCancel={release}
                 onContextMenu={(e) => e.preventDefault()}
+                onClick={(e) => e.detail === 0 && sealed && onBreak?.()} // keyboard activation: no hold needed
                 className="relative block h-[4.5rem] w-[4.5rem] touch-none select-none rounded-full [-webkit-touch-callout:none]"
                 initial={resealed ? { scale: 1.35, opacity: 0 } : false}
                 animate={resealed ? { scale: [1.35, 1.35, 1], opacity: [0, 0, 1] } : { scale: 1, opacity: 1 }}
