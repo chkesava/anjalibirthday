@@ -1,224 +1,153 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
-import { motion, AnimatePresence } from "motion/react"
-import { Mail, Heart, Sparkles, RotateCcw } from "lucide-react"
-import confetti from "canvas-confetti"
+import { useEffect, useRef, useState } from "react"
+import { AnimatePresence, motion, useReducedMotion } from "motion/react"
+import { BIRTHDAY } from "../data/config"
+import { useKeys } from "../hooks/useKey"
+import Envelope from "./letter/Envelope"
+import LetterSheet from "./letter/LetterSheet"
+import { EASE_IN_OUT, EASE_SOFT } from "./ui/motion"
 
-export default function Letter() {
-    const [isOpen, setIsOpen] = useState(false)
-    const [showText, setShowText] = useState(false)
-    const [currentText, setCurrentText] = useState("")
-    const [showCursor, setShowCursor] = useState(true)
+// 06 — The Letter.
+//
+//   an envelope arrives → she presses and holds the wax seal → it cracks, the flap swings up,
+//   the letter rises out → the room lights up onto paper and the sheet settles into place →
+//   the words surface at reading pace → she folds it and keeps it: it slips back into the
+//   envelope and the seal is pressed on again → "kept." (or she reads it again first).
+//
+// The words come from public/letter.txt, unchanged.
 
-    // Load the letter content from a text file in the public folder (public/letter.txt)
-    // Put the text file at: public/letter.txt
-    const [letterText, setLetterText] = useState("");
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+const [yy, mm, dd] = BIRTHDAY.slice(0, 10).split("-").map(Number)
+const handDate = `${dd} ${MONTHS[mm - 1]} ${yy}`
+const postmark = `${String(dd).padStart(2, "0")}.${String(mm).padStart(2, "0")}\n${yy}`
 
-    useEffect(() => {
-        if (showText && !letterText) {
-            // Fetch the letter text from the public folder. This runs once when the letter is opened.
-            fetch('/letter.txt')
-                .then((res) => {
-                    if (!res.ok) throw new Error('Failed to fetch letter text');
-                    return res.text();
-                })
-                .then((text) => setLetterText(text))
-                .catch((err) => {
-                    console.error('Error loading letter text:', err);
-                    // Fallback - brief message if file not found
-                    setLetterText('Dear Anjali,\nHappy Birthday! 🎉');
-                });
-        }
-
-        if (showText && letterText) {
-            let index = 0
-            const timer = setInterval(() => {
-                if (index < letterText.length) {
-                    setCurrentText(letterText.slice(0, index + 1))
-                    index++
-
-                } else {
-                    clearInterval(timer)
-                    setShowCursor(false)
-                    confetti({
-                        particleCount: 50,
-                        spread: 70,
-                        origin: { y: 0.6 },
-                        colors: ["#ff69b4", "#ff1493", "#9370db", "#8a2be2", "#ffd700"],
-                    })
-                }
-            }, 50)
-
-            return () => clearInterval(timer)
-        }
-    }, [showText, letterText])
-
-    // Auto-scroll to latest text while typing
-    const scrollRef = useRef(null);
+export default function Letter({ text, onNext, onBack }) {
+    const reduced = useReducedMotion()
+    // envelope → opening → read → keeping → kept
+    const [phase, setPhase] = useState("envelope")
+    const [prompt, setPrompt] = useState(false)
+    const [nudged, setNudged] = useState(false) // a quick tap on the seal: ask her to hold it
+    const timers = useRef([])
+    const later = (fn, ms) => timers.current.push(setTimeout(fn, reduced ? Math.min(ms, 500) : ms))
 
     useEffect(() => {
-        const el = scrollRef.current;
-        if (!el) return;
+        const id = setTimeout(() => setPrompt(true), 1800)
+        const all = timers.current
+        return () => {
+            clearTimeout(id)
+            all.forEach(clearTimeout)
+        }
+    }, [])
 
-        // Smoothly scroll to bottom
-        el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
-    }, [currentText]);
-
-    const handleOpenLetter = () => {
-        setIsOpen(true)
-        setTimeout(() => {
-            setShowText(true)
-        }, 800)
+    const open = () => {
+        if (phase !== "envelope") return
+        setPhase("opening")
+        later(() => {
+            window.scrollTo(0, 0)
+            setPhase("read")
+        }, 3900)
     }
 
-    const handleReset = () => {
-        setIsOpen(false)
-        setShowText(false)
-        setCurrentText("")
-        setShowCursor(true)
-        setLetterText("")
+    const keep = () => {
+        if (phase !== "read") return
+        window.scrollTo(0, 0)
+        setPhase("keeping")
+        later(() => setPhase("kept"), 3600)
+        later(onNext, 6200)
     }
+
+    useKeys({ Enter: open, " ": open }, phase === "envelope")
+
+    const paperUp = phase === "opening" || phase === "read"
 
     return (
-        <motion.div
-            className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
-        >
-            <div className="max-w-4xl w-full">
-                <motion.div
-                    className="text-center mb-8"
-                    initial={{ y: -50, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.3 }}
-                >
-                    <h1 className="text-4xl md:text-6xl py-1 md:py-2 font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 mb-4">
-                        A Special Letter
-                    </h1>
-                    <p className="text-lg text-purple-300">Just for you, on your special day 💌</p>
-                </motion.div>
+        <div className="relative min-h-dvh">
+            {/* Lights up onto paper as the letter comes out; down again as it's put away. */}
+            <AnimatePresence>
+                {paperUp && (
+                    <motion.div
+                        key="paper"
+                        aria-hidden="true"
+                        className="paper-surface fixed inset-0 z-0"
+                        initial={{ clipPath: "circle(0% at 50% 42%)" }}
+                        animate={{ clipPath: "circle(150% at 50% 42%)", transition: { duration: 1.5, delay: reduced ? 0 : 2.7, ease: EASE_IN_OUT } }}
+                        exit={{ opacity: 0, transition: { duration: 1.2, ease: EASE_IN_OUT } }}
+                    />
+                )}
+            </AnimatePresence>
 
-                <motion.div
-                    className="relative w-full h-full flex justify-center "
-                    initial={{ scale: 0, rotate: -10 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{
-                        delay: 0.5,
-                        type: "spring",
-                        stiffness: 200,
-                    }}
-                >
-                    <AnimatePresence mode="wait">
-                        {!isOpen ? (
-                            <motion.div
-                                key="envelope"
-                                className="relative cursor-pointer"
-                                whileHover={{ scale: 1.05, rotate: 2 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={handleOpenLetter}
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ rotateX: -90, opacity: 0 }}
-                                transition={{ duration: 0.5 }}
-                            >
-                                <div className="w-80 h-52 bg-gradient-to-br from-pink-200 to-purple-200 rounded-2xl shadow-2xl border-2 border-pink-300 relative overflow-hidden">
-                                    <div className="absolute top-0 left-0 w-full h-26 bg-gradient-to-br from-pink-300 to-purple-300 transform origin-top"></div>
-                                    <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-br from-pink-100 to-purple-100"></div>
-                                    <div className="absolute inset-0 flex items-center justify-center">
-                                        <Mail className="w-16 h-16 text-pink-500" />
-                                    </div>
-                                    <div className="absolute top-4 right-4">
-                                        <Heart className="w-6 h-6 text-red-500 fill-current" />
-                                    </div>
-                                    <div className="absolute bottom-4 left-4">
-                                        <Sparkles className="w-6 h-6 text-yellow-500" />
-                                    </div>
-                                    <motion.div
-                                        className="absolute bottom-3 left-1/2 transform -translate-x-1/2 text-pink-700 text-base font-semibold"
-                                        animate={{ opacity: [0.5, 1, 0.5] }}
-                                        transition={{ duration: 1.5, repeat: Infinity }}
-                                    >
-                                        Click to open
-                                    </motion.div>
-                                </div>
-                            </motion.div>
-                        ) : (
-                            <motion.div
-                                key="letter"
-                                className="w-full max-w-2xl rounded-2xl shadow-2xl border-2 border-pink-300 p-8 relative transition-all"
-                                initial={{ rotateX: -90, opacity: 0 }}
-                                animate={{ rotateX: 0, opacity: 1 }}
-                                exit={{ opacity: 0, scale: 0.2 }}
-                                transition={{ duration: 0.8, type: "spring" }}
-                                style={{
-                                    background:
-                                        "linear-gradient(135deg, #fce7f3 0%, #fae8ff 25%, #e0e7ff 50%, #fdf2f8 75%, #fce7f3 100%)",
+            <AnimatePresence mode="wait">
+                {(phase === "envelope" || phase === "opening") && (
+                    <motion.div
+                        key="envelope"
+                        className="night-vignette relative z-10 flex min-h-dvh flex-col items-center justify-center px-6 pb-[10vh]"
+                        exit={{ opacity: 0, transition: { duration: 0.4 } }}
+                    >
+                        <motion.div
+                            initial={{ opacity: 0, y: 26, rotate: -1.2 }}
+                            animate={
+                                phase === "opening"
+                                    ? { opacity: [1, 1, 0], y: [0, 0, 40], rotate: 0, transition: { duration: 3.3, times: [0, 0.84, 1], ease: EASE_IN_OUT } }
+                                    : { opacity: 1, y: 0, rotate: -1.2, transition: { duration: 1.2, delay: 0.3, ease: EASE_SOFT } }
+                            }
+                        >
+                            <Envelope
+                                state={phase === "opening" ? "opening" : "sealed"}
+                                onBreak={open}
+                                onNudge={() => {
+                                    setNudged(true)
+                                    setPrompt(true)
                                 }}
-                            >
-                                <div className="text-center mb-6">
-                                    <motion.div
-                                        className="inline-block"
-                                        animate={{ rotate: [0, 5, -5, 0] }}
-                                        transition={{ duration: 3, repeat: Infinity }}
-                                    >
-                                        <Heart className="w-12 h-12 text-red-500 fill-current mx-auto mb-3" />
-                                    </motion.div>
-                                </div>
+                                to="Anjali"
+                                postmark={postmark}
+                            />
+                        </motion.div>
+                        <motion.p
+                            className="t-meta mt-12 normal-case tracking-[0.04em] text-cream-faint"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: prompt && phase === "envelope" ? 1 : 0 }}
+                            transition={{ duration: 1.2 }}
+                            aria-live="polite"
+                        >
+                            {nudged ? "hold it a moment longer" : "press and hold the seal"}
+                        </motion.p>
+                    </motion.div>
+                )}
 
-                                <div ref={scrollRef} className="min-h-72 max-h-72 overflow-y-auto text-gray-700 leading-relaxed">
-                                    {showText && (
-                                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-3 mr-2 ">
-                                            <div className="whitespace-pre-wrap font-cute">
-                                                {currentText}
-                                                {showCursor && (
-                                                    <motion.span
-                                                        className="inline-block w-0.5 h-4 bg-purple-600 ml-1"
-                                                        animate={{ opacity: [0, 1, 0] }}
-                                                        transition={{ duration: 0.8, repeat: Infinity }}
-                                                    />
-                                                )}
-                                            </div>
-                                        </motion.div>
-                                    )}
-                                </div>
+                {phase === "read" && (
+                    <motion.div key="sheet" exit={{ opacity: 0, y: -10, transition: { duration: 0.8, ease: EASE_IN_OUT } }}>
+                        <LetterSheet text={text} date={handDate} onKeep={keep} onBack={onBack} />
+                    </motion.div>
+                )}
 
-                                {currentText === letterText && (
-                                    <motion.div
-                                        className="text-center mt-6"
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: 1 }}
-                                    >
-                                        <button
-                                            onClick={handleReset}
-                                            className="inline-flex items-center gap-2 bg-white/60 text-pink-600 font-medium border border-pink-400 px-5 py-2 rounded-full hover:bg-pink-100 transition-all"
-                                        >
-                                            <RotateCcw className="w-4 h-4" />
-                                            Read Again
-                                        </button>
-                                    </motion.div>
-                                )}
-
-                                <div className="absolute top-4 left-4">
-                                    <Sparkles className="w-6 h-6 text-yellow-500" />
-                                </div>
-                                <div className="absolute top-4 right-4">
-                                    <Heart className="w-6 h-6 text-rose-500 fill-current" />
-                                </div>
-                                <div className="absolute bottom-4 left-4">
-                                    <Heart className="w-6 h-6 text-pink-500 fill-current" />
-                                </div>
-                                <div className="absolute bottom-4 right-4">
-                                    <Sparkles className="w-6 h-6 text-purple-500" />
-                                </div>
-                            </motion.div>
-
-                        )}
-                    </AnimatePresence>
-                </motion.div>
-            </div>
-        </motion.div>
+                {(phase === "keeping" || phase === "kept") && (
+                    <motion.div
+                        key="keeping"
+                        className="night-vignette relative z-10 flex min-h-dvh flex-col items-center justify-center px-6 pb-[10vh]"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1, transition: { duration: 1 } }}
+                        exit={{ opacity: 0, transition: { duration: 0.8 } }}
+                    >
+                        <motion.div
+                            initial={{ y: 30, rotate: 0 }}
+                            animate={{ y: 0, rotate: phase === "kept" ? -1.2 : 0 }}
+                            transition={{ duration: 1.2, ease: EASE_SOFT }}
+                        >
+                            <Envelope state="closing" to="Anjali" postmark={postmark} />
+                        </motion.div>
+                        <motion.p
+                            className="mt-12 font-display italic text-cream-muted"
+                            style={{ fontSize: "clamp(1.125rem, 4.4vw, 1.375rem)" }}
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: phase === "kept" ? 1 : 0, y: phase === "kept" ? 0 : 6 }}
+                            transition={{ duration: 1.4, ease: EASE_SOFT }}
+                        >
+                            kept.
+                        </motion.p>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
     )
 }

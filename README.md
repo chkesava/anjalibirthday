@@ -1,56 +1,27 @@
-# 🎂 Birthday Surprise V2 – A Modern & Emotional Birthday Gift
+# for Anjali
 
-Celebrate someone’s birthday in a unique and heart-touching way with this new version of the "Birthday Surprise" website. This version includes beautiful animations, confetti, a photo slideshow, and a special countdown – all crafted to create an unforgettable moment. 💖
+A small private website made by Kesava for Anjali's birthday (20 October).
 
-> ⚠️ This is a **free version**, so some features like background music, animations and message cards are not included. Premium version includes full photo gallery, music, animations and personal message cards. If you want premium code then DM me on Instagram.
+It's a short, cinematic story you move through at your own pace: the arrival, a candle, the chaos archive, our timeline, the letter, and the credits.
 
----
-
-## 🛠 Tech Stack
-
-- ⚛️ **Next.js** – React Framework for building fast UI
-- 🎨 **Tailwind CSS** – For modern and responsive styling
-- 🎞️ **Framer Motion** – Smooth entrance and fade animations
-- 🎊 **Canvas Confetti** – Birthday celebration confetti effect
-- 🖼️ **Swiper.js** – For smooth image slideshow
-
----
-
-## 🖥 Local Setup
-
-To run this project locally, follow these steps:
+## Run it
 
 ```bash
-# Clone the repository
-git clone https://github.com/Anuj579/birthday-site-v2.git
-
-# Navigate into the folder
-cd birthday-site-v2
-
-# Install dependencies
 npm install
-
-# Start the development server
 npm run dev
 ```
 
-Then open [http://localhost:3000](http://localhost:3000) in your browser to explore the site.
+Then open <http://localhost:3000/?preview>. The `?preview` part skips the "too early" countdown before the birthday.
 
----
+## Where things live
 
-## 🔗 Social Media
+| What | Where |
+|---|---|
+| Birthday date, song path, voice note, WhatsApp number | `src/app/data/config.js` |
+| Photos, captions, dates, chapter titles, memories, inside jokes, notes | `src/app/data/memories.js` (images in `public/memories/`). Fields marked `EDIT` are empty until you fill them — empty fields are simply not shown. |
+| Opening lines, "things I never say", credits | `src/app/data/story.js` |
+| The letter | `public/letter.txt` |
+| The soundtrack | `public/audio/` (drop `yaaron.mp3` here) |
+| Original, untouched photos | `public/images/` |
 
-Follow me for more emotional surprise websites and creative dev content:
-
-- 📷 Instagram: [@anujbuilds](https://instagram.com/anujbuilds)
-- 🎬 YouTube: [@anujbuilds](https://youtube.com/@anujbuilds)
-- 🐦 Twitter: [@anujbuilds](https://twitter.com/anujbuilds)
-- 💼 LinkedIn: [Anuj Chaudhary](https://linkedin.com/in/anujchaudhary549)
-
----
-
-## ⭐ Support
-
-If you found this project lovely, please consider giving it a ⭐ on [GitHub](https://github.com/Anuj579)  
-Thank you for being here! 🫶  
-Made with emotions by **Anuj** – _@anujbuilds_
+Design and story notes: `BIRTHDAY_EXPERIENCE_AUDIT.md`, `BIRTHDAY_DESIGN_SYSTEM.md`, `BIRTHDAY_STORYBOARD.md`.

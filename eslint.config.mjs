@@ -9,6 +9,15 @@ const compat = new FlatCompat({
   baseDirectory: __dirname,
 });
 
-const eslintConfig = [...compat.extends("next/core-web-vitals")];
+const eslintConfig = [
+  ...compat.extends("next/core-web-vitals"),
+  {
+    rules: {
+      // Photos are pre-sized in public/memories/ and rendered as physical "prints" with
+      // intrinsic sizing, so next/image's optimisation layer isn't needed.
+      "@next/next/no-img-element": "off",
+    },
+  },
+];
 
 export default eslintConfig;
